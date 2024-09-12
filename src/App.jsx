@@ -1,27 +1,43 @@
 import { useEffect, useState } from "react";
 import Loading from "./Loading";
+import Tours from "./Tours";
 
 const url = "https://www.course-api.com/react-tours-project";
 
 const App = () => {
-  const [tours, setTours] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [tours, setTours] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchTours = async () => {
-      setLoading(true);
+  const fetchTours = async () => {
+    setIsLoading(true);
+    try {
       const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
       const data = await response.json();
       setTours(data);
-      setLoading(false);
-    };
+    } catch (error) {
+      console.error("Failed to fetch tours:", error);
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
     fetchTours();
   }, []);
 
-  if (loading) {
-    return <Loading />;
+  if (isLoading) {
+    return (
+      <main>
+        <Loading />;
+      </main>
+    );
   }
-
-  return <h2>Tours Starter</h2>;
+  return (
+    <main>
+      <Tours tours={tours} />
+    </main>
+  );
 };
 export default App;
